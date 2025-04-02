@@ -1,163 +1,104 @@
-import 'package:app_calculadora_carbohidratos/calculos/calculo_total.dart';
 import 'package:flutter/material.dart';
 
-class Calcular1 extends StatefulWidget {
-  final Map<String, List<String>> alimentosPorSeccion;
-  final Map<String, List<double>> cantidadesPorSeccion;
+class Calcular1 extends StatelessWidget {
   final double hcTotal;
 
-  const Calcular1({
-    super.key,
-    required this.alimentosPorSeccion,
-    required this.cantidadesPorSeccion,
-    required this.hcTotal,
-    required alimento1,
-    required String alimento2,
-    required double cantidad2,
-    required double cantidad1,
-    required List cantidades,
-    required List alimentosSeleccionados,
-    required double glucemia,
-  });
-
-  @override
-  _Calcular1State createState() => _Calcular1State();
-}
-
-class _Calcular1State extends State<Calcular1> {
-  Map<String, List<String>> alimentosAcumulados = {};
-  Map<String, List<double>> cantidadesAcumuladas = {};
-  double hcAcumulado = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _acumularDatos();
-  }
-
-  void _acumularDatos() {
-    setState(() {
-      hcAcumulado = widget.hcTotal;
-      widget.alimentosPorSeccion.forEach((seccion, alimentos) {
-        if (!alimentosAcumulados.containsKey(seccion)) {
-          alimentosAcumulados[seccion] = [];
-          cantidadesAcumuladas[seccion] = [];
-        }
-        for (int i = 0; i < alimentos.length; i++) {
-          alimentosAcumulados[seccion]!.add(alimentos[i]);
-          double hc = widget.cantidadesPorSeccion[seccion]![i];
-          cantidadesAcumuladas[seccion]!.add(hc);
-          hcAcumulado += hc;
-        }
-      });
-    });
-  }
+  const Calcular1(
+      {super.key,
+      required this.hcTotal,
+      required alimento1,
+      required String alimento2,
+      required double cantidad2,
+      required double cantidad1,
+      required List alimentosSeleccionados,
+      required List cantidades,
+      required Map alimentosPorSeccion,
+      required Map cantidadesPorSeccion,
+      required double glucemia});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Resultados del Cálculo"),
-        backgroundColor: Colors.teal,
+        title: const Text("Resultado"),
         centerTitle: true,
-        elevation: 4,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (var seccion in alimentosAcumulados.keys) ...[
-              Text("Sección: $seccion",
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold)),
-              for (int i = 0;
-                  i < alimentosAcumulados[seccion]!.length;
-                  i++) ...[
-                Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("${alimentosAcumulados[seccion]![i]}",
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
-                        Text(
-                            "Cantidad: ${cantidadesAcumuladas[seccion]![i]} gramos",
-                            style: const TextStyle(
-                                fontSize: 16, color: Colors.black54)),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-              ],
-              const SizedBox(height: 20),
-            ],
-            _buildInfoCard("Total HC", "${hcAcumulado.toStringAsFixed(2)} g"),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              child: const Text("Regresar", style: TextStyle(fontSize: 16)),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CalculoTotal(
-                      hcCalcular: hcAcumulado,
-                      hcCalcular1:
-                          0, // Aquí irán los valores reales de los otros cálculos.
-                      hcCalcular2: 0,
-                      hcCalcular3: 0,
-                      hcCalcular4: 0,
-                      hcCalcular5: 0,
-                      hcCalcular6: 0,
-                      hcCalcular7: 0,
-                    ),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              child: const Text("Ver Total", style: TextStyle(fontSize: 16)),
-            ),
-          ],
+        backgroundColor: Color(0xFF1F5D68),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
-    );
-  }
-
-  Widget _buildInfoCard(String title, String value) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        title: Text(title,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        trailing: Text(value,
-            style: const TextStyle(fontSize: 16, color: Colors.teal)),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Total de Hidratos de Carbono",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Text(
+                      "${hcTotal.toStringAsFixed(2)} g",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF1F5D68),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: 150,
+                height: 45,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF1F5D68),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  child: const Text(
+                    "Regresar",
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
+      backgroundColor: Color(0xFFE3ECE7),
     );
   }
 }

@@ -1,9 +1,17 @@
-import 'package:app_calculadora_carbohidratos/pages/home_page.dart';
+import 'package:app_calculadora_carbohidratos/pages/plashScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:app_calculadora_carbohidratos/themes/theme_provider.dart';
 
 void main() {
   runApp(
-    const MyApp(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+            create: (_) => ThemeProvider()), // Agrega tu ThemeProvider aquí
+      ],
+      child: const MyApp(),
+    ),
   );
 }
 
@@ -12,11 +20,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Calculadora de HC',
-      theme: ThemeData(primarySwatch: Colors.red),
-      home: const HomePage(),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: themeProvider
+              .getTheme(), // Asegúrate de tener esta función en ThemeProvider
+          home: const SplashScreen(),
+        );
+      },
     );
   }
 }

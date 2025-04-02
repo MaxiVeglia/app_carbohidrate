@@ -32,7 +32,7 @@ class _PanificadosState extends State<Panificados> {
     }
   }
 
-  void calcularCarbohidratos() {
+  void calcularCarbohidratos() async {
     if (alimentoSeleccionado == null) {
       mostrarMensaje("Por favor, selecciona un alimento.");
       return;
@@ -46,7 +46,7 @@ class _PanificadosState extends State<Panificados> {
     double? gramos = double.tryParse(gramosController.text);
 
     if (gramos == null) {
-      mostrarMensaje("Ingresa un valor numérico válido.");
+      mostrarMensaje("Ingresa valores numéricos válidos.");
       return;
     }
 
@@ -62,24 +62,37 @@ class _PanificadosState extends State<Panificados> {
       return;
     }
 
-    // Obtener la porción en gramos y los carbohidratos por porción de la API
+    // Mostrar el diálogo de carga
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    // Simular un tiempo de espera antes de calcular
+    await Future.delayed(const Duration(seconds: 1, milliseconds: 500));
+
     double porcionGramos = double.parse(alimento["porcion_gr"].toString());
     double hcPorPorcion = double.parse(alimento["HC_gr"].toString());
 
-    // Calcular los HC de acuerdo con la cantidad seleccionada, basada en la porción de la API
     hcTotal = (gramos / porcionGramos) * hcPorPorcion;
 
-    // Navegar a la siguiente pantalla con el valor actualizado de hcTotal
+    Navigator.pop(context); // Cierra el diálogo de carga
+
+    // Navegar a la pantalla de cálculo
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => Calcular6(
           alimento1: alimento["alimento"],
-          alimento2: "", // Agregar valor adecuado
+          alimento2: "",
           cantidad1: gramos,
-          cantidad2: 0.0, // Agregar valor adecuado
-          hcTotal: hcTotal, alimentosSeleccionados: [],
-          cantidades: [], alimentosPorSeccion: {}, cantidadesPorSeccion: {},
+          cantidad2: 0.0,
+          hcTotal: hcTotal,
+          alimentosSeleccionados: [],
+          cantidades: [],
+          alimentosPorSeccion: {},
+          cantidadesPorSeccion: {},
           glucemia: 0.0,
         ),
       ),
@@ -95,11 +108,17 @@ class _PanificadosState extends State<Panificados> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: const Color(0xFFDDEAE3),
       appBar: AppBar(
-        title: const Text("Selecciona un Alimento"),
+        backgroundColor: const Color(0xFF1F4D57),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text("Cereales", style: TextStyle(color: Colors.white)),
         centerTitle: true,
-        backgroundColor: Colors.teal,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -107,46 +126,39 @@ class _PanificadosState extends State<Panificados> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            alimentos.isEmpty
-                ? const Center(child: CircularProgressIndicator())
-                : Column(
-                    children: [
-                      _buildDropdown(
-                          "Selecciona un alimento", alimentoSeleccionado,
-                          (value) {
-                        setState(() {
-                          alimentoSeleccionado = value;
-                        });
-                      }),
-                      const SizedBox(height: 20),
-                      TextField(
-                        controller: gramosController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: "Ingresa los gramos",
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      ElevatedButton(
-                        onPressed: calcularCarbohidratos,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.teal,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                        ),
-                        child: const Text(
-                          "Calcular Carbohidratos",
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
+            _buildDropdown("Selecciona un alimento", alimentoSeleccionado,
+                (value) {
+              setState(() {
+                alimentoSeleccionado = value;
+              });
+            }),
+            const SizedBox(height: 20),
+            TextField(
+              controller: gramosController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: "Ingresa la cantidad (gramos)",
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: calcularCarbohidratos,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1F4D57),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 15),
+              ),
+              child: const Text(
+                "Calcular",
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
+            ),
           ],
         ),
       ),

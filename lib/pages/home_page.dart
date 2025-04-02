@@ -1,4 +1,4 @@
-import 'package:app_calculadora_carbohidratos/DrawerSection/my_drawer.dart';
+import 'package:app_calculadora_carbohidratos/Configuracion/config_page.dart';
 import 'package:app_calculadora_carbohidratos/Secciones%20Diferentes/cereales.dart';
 import 'package:app_calculadora_carbohidratos/Secciones%20Diferentes/comidas.dart';
 import 'package:app_calculadora_carbohidratos/Secciones%20Diferentes/dulces.dart';
@@ -8,111 +8,132 @@ import 'package:app_calculadora_carbohidratos/Secciones%20Diferentes/lacteos.dar
 import 'package:app_calculadora_carbohidratos/Secciones%20Diferentes/panificados.dart';
 import 'package:app_calculadora_carbohidratos/Secciones%20Diferentes/vegetales.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final appBarColor = Colors.redAccent;
-    final tileColor = Colors.purple.shade200;
-    final iconColor = Colors.white;
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+
+  static final List<Widget> _pages = [
+    const HomeContent(), // Contenido principal de la HomePage
+    const ConfigPage(), // Página de configuración
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: const Color(0xFFE8F0F1),
       appBar: AppBar(
         title: const Text(
-          "¡Calcula Los Carbohidratos!",
-          style: TextStyle(fontFamily: "copperplate", fontSize: 24),
+          "CARBOTRACK",
+          style: TextStyle(
+              fontFamily: "Montserrat",
+              fontSize: 24,
+              fontWeight: FontWeight.bold),
         ),
-        foregroundColor: Colors.white,
+        backgroundColor: const Color(0xFF1A5C65),
         centerTitle: true,
-        backgroundColor: appBarColor,
+        foregroundColor: Colors.white,
       ),
-      drawer: MyDrawer(),
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage(
-                    "https://previews.123rf.com/images/metrue/metrue1710/metrue171000003/88085246-patr%C3%B3n-sin-fisuras-con-puntos-negros-sobre-fondo-blanco-m%C3%ADnima-fondo-blanco-dise%C3%B1o-del-ornamento.jpg"),
-                fit: BoxFit.cover,
-              ),
-            ),
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF1A5C65),
+        selectedItemColor: const Color(0xFFE8F0F1),
+        unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(LucideIcons.home),
+            label: 'Home',
           ),
-          Center(
-            child: GridView.count(
-              padding: const EdgeInsets.all(20),
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              children: [
-                _buildCardButton(context, "Cereales", Icons.rice_bowl,
-                    tileColor, iconColor, const Cereales()),
-                _buildCardButton(context, "Comidas", Icons.fastfood, tileColor,
-                    iconColor, Comidas()),
-                _buildCardButton(context, "Dulces", Icons.cake, tileColor,
-                    iconColor, const Dulces()),
-                _buildCardButton(context, "Frutas", Icons.apple, tileColor,
-                    iconColor, const Frutas()),
-                _buildCardButton(context, "Lacteos", Icons.local_drink,
-                    tileColor, iconColor, Lacteos()),
-                _buildCardButton(context, "Panificados", Icons.bakery_dining,
-                    tileColor, iconColor, Panificados()),
-                _buildCardButton(context, "Vegetales", Icons.grass, tileColor,
-                    iconColor, const Vegetales()),
-                _buildCardButton(context, "Extras", Icons.category, tileColor,
-                    iconColor, const Extras()),
-              ],
-            ),
+          BottomNavigationBarItem(
+            icon: Icon(LucideIcons.settings),
+            label: 'Configuración',
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildCardButton(BuildContext context, String label, IconData icon,
-      Color tileColor, Color iconColor, Widget page) {
-    return GestureDetector(
-      onTap: () => _navigateWithLoading(context, page),
-      child: Card(
-        elevation: 5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        color: tileColor,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: iconColor, size: 40),
-            const SizedBox(height: 10),
-            Text(
-              label,
-              style: TextStyle(
-                  fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
+class HomeContent extends StatelessWidget {
+  const HomeContent({super.key});
+
+  void _navigateWithLoading(BuildContext context, Widget page) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+    Future.delayed(const Duration(seconds: 1), () {
+      Navigator.pop(context); // Cierra el diálogo de carga
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => page),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: GridView.count(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        children: [
+          _buildCardButton(context, "Cereales", LucideIcons.wheat, Cereales()),
+          _buildCardButton(context, "Comidas", LucideIcons.utensils, Comidas()),
+          _buildCardButton(
+              context, "Vegetales", LucideIcons.carrot, Vegetales()),
+          _buildCardButton(context, "Frutas", LucideIcons.apple, Frutas()),
+          _buildCardButton(context, "Dulces", LucideIcons.candy, Dulces()),
+          _buildCardButton(context, "Lácteos", LucideIcons.milk, Lacteos()),
+          _buildCardButton(
+              context, "Panificados", LucideIcons.croissant, Panificados()),
+          _buildCardButton(context, "Extras", LucideIcons.star, Extras()),
+        ],
       ),
     );
   }
 
-  Future<void> _navigateWithLoading(BuildContext context, Widget page) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Center(
-          child: CircularProgressIndicator(color: Colors.indigo.shade900),
-        );
-      },
-    );
-
-    await Future.delayed(const Duration(seconds: 2));
-
-    Navigator.pop(context);
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => page),
+  Widget _buildCardButton(
+      BuildContext context, String label, IconData icon, Widget page) {
+    return GestureDetector(
+      onTap: () => _navigateWithLoading(context, page),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        color: const Color(0xFF2D95A1),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white, size: 40),
+            const SizedBox(height: 10),
+            Text(
+              label,
+              style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

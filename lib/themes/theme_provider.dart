@@ -22,4 +22,6 @@ class ThemeProvider extends ChangeNotifier {
       themeData = lightMode;
     }
   }
+
+  getTheme() {}
 }
